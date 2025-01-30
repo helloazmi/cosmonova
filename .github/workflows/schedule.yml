@@ -3,8 +3,9 @@ name: Run Cosmonova Bot
 on:
   schedule:
     - cron: '30 0 * * *'   # Runs every day at 00:30
+    - cron: '45 1 * * *'    # Runs every day at 01:45
     - cron: '45 9 * * *'    # Runs every day at 09:45
-    - cron: '15 12 * * *'   # Runs every day at 12:15
+    - cron: '00 13 * * *'   # Runs every day at 13:00
     - cron: '15 17 * * *'   # Runs every day at 17:15
   workflow_dispatch:          # Allows you to manually trigger the workflow
 
@@ -27,8 +28,8 @@ jobs:
       - name: Install Chrome
         run: sudo apt-get install -y google-chrome-stable
 
+      - name: Install Puppeteer browsers
+        run: npx puppeteer install
+
       - name: Run the bot script
         run: node index.js
-
-        - name: Install Puppeteer browsers
-        run: npx puppeteer install
