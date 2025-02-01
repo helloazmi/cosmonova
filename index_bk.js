@@ -1,14 +1,18 @@
 const puppeteer = require('puppeteer');
+require('dotenv').config();
+const { FindDatesAfter, swedishMonths } = require('./functions');
+const { sendMessage } = require('./botzilla');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
-    const page = await browser.newPage();
+    const browser = await puppeteer.launch({
+        headless: true,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
+    });
 
-    // Set window size
-    await page.setViewport({ width: 390, height: 844 });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 390, height: 844 });  // Simulate iPhone 12 Pro
 
     try {
-        // Navigate to page and open dropdown
         await page.goto('https://booking.nrm.se/booking/1/1/offers/232', { waitUntil: 'networkidle0' });
         await page.click('#dateFilterButton');
 
@@ -19,46 +23,34 @@ const puppeteer = require('puppeteer');
                 .filter(text => /\d{1,2} \w+ \d{4}/.test(text))
         );
 
-        // Convert raw dates to YYYY-MM-DD format
-        const swedishMonths = {
-            "januari": "01", "februari": "02", "mars": "03", "april": "04", "maj": "05",
-            "juni": "06", "juli": "07", "augusti": "08", "september": "09", "oktober": "10",
-            "november": "11", "december": "12"
-        };
-
         const formattedDates = rawDates.map(date => {
             let [day, month, year] = date.split(' ');
-            return `${year}-${swedishMonths[month.toLowerCase()]}-${day.padStart(2, '0')}`;  // YYYY-MM-DD format
+            return `${year}-${swedishMonths[month.toLowerCase()]}-${day.padStart(2, '0')}`;  // Format to YYYY-MM-DD
         });
 
         // Output raw and formatted dates
         console.log('📅 Found dates in the dropdown:');
         rawDates.forEach((rawDate, i) => console.log(`${rawDate} --> ${formattedDates[i]}`));
+
         console.log('Formatted Dates Array:', formattedDates);
 
-        // Call the function to check for dates after a specific date
-        FindDatesAfter('2025-02-26', formattedDates);
+        // Check for dates after a specific date
+        const res = FindDatesAfter('2025-02-26', formattedDates);
+
+        // Send the result as a Telegram message
+        if (res.datesAfterCutoff.length > 0) {
+            sendMessage(`🚀 There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}`);
+        } else {
+            sendMessage(`✅ No dates found after ${res.cutoffDate}.`);
+        }
 
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        await browser.close();
+        if (browser) {
+            await browser.close();
+            console.log('Browser closed.');
+        }
+        process.exit(0);  // Exit the process
     }
 })();
-
-/**
- * Find and log dates after the given cutoff date.
- * @param {string} cutoffDate - The date to check against in YYYY-MM-DD format.
- * @param {string[]} datesArray - Array of dates in YYYY-MM-DD format.
- */
-function FindDatesAfter(cutoffDate, datesArray) {
-    const cutoff = new Date(cutoffDate);
-    const datesAfterCutoff = datesArray.filter(date => new Date(date) > cutoff);
-
-    if (datesAfterCutoff.length > 0) {
-        console.log(`🚀 There are ${datesAfterCutoff.length} dates after ${cutoffDate}:`);
-        console.log(datesAfterCutoff);
-    } else {
-        console.log(`✅ No dates after ${cutoffDate}.`);
-    }
-}
