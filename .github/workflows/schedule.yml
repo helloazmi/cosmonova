@@ -2,12 +2,8 @@ name: Run Cosmonova Bot
 
 on:
   schedule:
-    - cron: '30 0 * * *'   # Runs every day at 00:30
-    - cron: '45 1 * * *'    # Runs every day at 01:45
-    - cron: '45 9 * * *'    # Runs every day at 09:45
-    - cron: '00 13 * * *'   # Runs every day at 13:00
-    - cron: '15 17 * * *'   # Runs every day at 17:15
-  workflow_dispatch:          # Allows you to manually trigger the workflow
+    - cron: '*/3 * * * *'  # Runs every 3 minutes
+  workflow_dispatch:          # Allows manual triggering of the workflow
 
 jobs:
   run-bot:
