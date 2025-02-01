@@ -4,9 +4,13 @@ const { FindDatesAfter, swedishMonths } = require('./functions');
 const { sendMessage } = require('./botzilla');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+        headless: true,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // Use environment path or fallback to Ubuntu's Chrome path
+    });
+
     const page = await browser.newPage();
-    await page.setViewport({ width: 390, height: 844 });
+    await page.setViewport({ width: 390, height: 844 });  // iPhone 12 Pro size
 
     try {
         await page.goto('https://booking.nrm.se/booking/1/1/offers/232', { waitUntil: 'networkidle0' });
@@ -21,7 +25,7 @@ const { sendMessage } = require('./botzilla');
 
         const formattedDates = rawDates.map(date => {
             let [day, month, year] = date.split(' ');
-            return `${year}-${swedishMonths[month.toLowerCase()]}-${day.padStart(2, '0')}`;  // YYYY-MM-DD format
+            return `${year}-${swedishMonths[month.toLowerCase()]}-${day.padStart(2, '0')}`;  // Convert to YYYY-MM-DD
         });
 
         // Output raw and formatted dates
@@ -30,12 +34,15 @@ const { sendMessage } = require('./botzilla');
 
         console.log('Formatted Dates Array:', formattedDates);
 
-
-        // Call the function to check for dates after a specific date
+        // Check for dates after a specific date
         const res = FindDatesAfter('2025-02-26', formattedDates);
-        //console.log(res.msg);
 
-        sendMessage(`There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}`);
+        // Send the result as a Telegram message
+        if (res.datesAfterCutoff.length > 0) {
+            sendMessage(`🚀 There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}`);
+        } else {
+            sendMessage(`✅ No dates found after ${res.cutoffDate}.`);
+        }
 
     } catch (error) {
         console.error('Error:', error);
@@ -44,8 +51,6 @@ const { sendMessage } = require('./botzilla');
             await browser.close();
             console.log('Browser closed.');
         }
-        process.exit(0);  // Forcefully exit the process
+        process.exit(0);  // Exit the process
     }
 })();
-
-
