@@ -7,17 +7,17 @@ dotenv.config();
 
 (async () => {
     listen();
-    const browser = await
-        puppeteer.launch({
-            headless: true,
-            // Render.com
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    const browser = await puppeteer.launch({
+        headless: true,
+        // Render.com
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/linux-132.0.6834.110/chrome-linux64/chrome',
 
-            //executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/linux-132.0.6834.110/chrome-linux64/chrome'
-            //Github
-            //executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
-        });
-    console.log(process.env.PUPPETEER_EXECUTABLE_PAT)
+        // Github
+        //executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
+    });
+
+    console.log('Executable Path:', process.env.PUPPETEER_EXECUTABLE_PATH);  // Log the path for debugging
+
     const page = await browser.newPage();
     await page.setViewport({ width: 390, height: 844 });  // iPhone 12 size
 
@@ -48,10 +48,10 @@ dotenv.config();
         // Send to Telegram
         if (res.datesAfterCutoff.length > 0) {
             sendMessage(`Interstellar @ Cosmonova – There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}\n https://booking.nrm.se/booking/1/1/offers/232`);
-            console.log("Found new dates!")
+            console.log("Found new dates!");
         } else {
             sendMessage(`Interstellar @ Cosmonova – No dates found after ${res.cutoffDate}.`);
-            console.log("Sorry!")
+            console.log("Sorry!");
         }
 
     } catch (error) {
