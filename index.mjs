@@ -1,15 +1,17 @@
 import puppeteer from 'puppeteer';
 import dotenv from 'dotenv';
 import { FindDatesAfter, swedishMonths } from './functions.mjs';
-import { sendMessage } from './botzilla.mjs';
+import { sendMessage, listen } from './botzilla.mjs';
 
 dotenv.config();
 
 (async () => {
-    const browser = await puppeteer.launch({
-        headless: true,
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
-    });
+    listen();
+    const browser = await
+        puppeteer.launch({
+            headless: true,
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
+        });
 
     const page = await browser.newPage();
     await page.setViewport({ width: 390, height: 844 });  // iPhone 12 size
@@ -33,14 +35,14 @@ dotenv.config();
         // Raw and formatted dates
         // console.log('📅 Found dates in the dropdown:');
         rawDates.forEach((rawDate, i) => console.log(`${rawDate} --> ${formattedDates[i]}`));
-        console.log('Formatted Dates Array:', formattedDates);
+        // console.log('Formatted Dates Array:', formattedDates);
 
         // Result
         const res = FindDatesAfter('2025-02-26', formattedDates);
 
         // Send to Telegram
         if (res.datesAfterCutoff.length > 0) {
-            sendMessage(`Interstellar @ Cosmonova – There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}`);
+            sendMessage(`Interstellar @ Cosmonova – There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}\n https://booking.nrm.se/booking/1/1/offers/232`);
             console.log("Found new dates!")
         } else {
             sendMessage(`Interstellar @ Cosmonova – No dates found after ${res.cutoffDate}.`);
