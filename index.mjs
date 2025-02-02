@@ -4,7 +4,16 @@ import { FindDatesAfter, swedishMonths } from './functions.mjs';
 import { sendMessage, listen } from './botzilla.mjs';
 import fs from 'fs';
 
+
+
+console.log('Puppeteer default cache directory:', puppeteer.defaultArgs().join('\n'));
+console.log('Expected Chrome executable path:', puppeteer.executablePath());
+
 dotenv.config();
+
+
+console.log('Puppeteer default cache directory:', puppeteer.defaultArgs().join('\n'));
+console.log('Expected Chrome executable path:', puppeteer.executablePath());
 
 (async () => {
     listen();

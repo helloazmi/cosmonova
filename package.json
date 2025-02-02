@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "chmod +x /opt/render/.cache/puppeteer/chrome/linux-132.0.6834.110/chrome-linux64/chrome",
     "start": "node index.mjs"
   },
   "keywords": [],
