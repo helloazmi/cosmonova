@@ -10,7 +10,8 @@ dotenv.config();
     const browser = await
         puppeteer.launch({
             headless: true,
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
+            executablePath: "/usr/bin/google-chrome"
+            //executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
         });
 
     const page = await browser.newPage();
