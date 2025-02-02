@@ -2,42 +2,27 @@ import puppeteer from 'puppeteer';
 import dotenv from 'dotenv';
 import { FindDatesAfter, swedishMonths } from './functions.mjs';
 import { sendMessage, listen } from './botzilla.mjs';
-import fs from 'fs';
-
-// Log Puppeteer's cache and executable path for debugging
-console.log('Puppeteer default cache directory:', puppeteer.defaultArgs().join('\n'));
-console.log('Expected Chrome executable path:', puppeteer.executablePath());
 
 dotenv.config();
 
 (async () => {
-    listen();  // Start listening for incoming Telegram messages
+    listen();
+    const browser = await
+        puppeteer.launch({
+            headless: true,
+            // Render.com
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
 
-    const chromePath = process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath();
-
-    // Log the path being used
-    console.log('🚀 Launching Puppeteer with executable path:', chromePath);
-
-    // Check if the file exists at the path
-    if (!fs.existsSync(chromePath)) {
-        console.error('❌ Chrome binary not found at:', chromePath);
-        process.exit(1);  // Stop execution if the binary is missing
-    }
-
-    // Launch Puppeteer with the specified Chrome executable
-    const browser = await puppeteer.launch({
-        headless: true,
-        executablePath: chromePath,  // Use environment or default path
-    });
+            //executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/linux-132.0.6834.110/chrome-linux64/chrome'
+            //Github
+            //executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
+        });
 
     const page = await browser.newPage();
     await page.setViewport({ width: 390, height: 844 });  // iPhone 12 size
 
     try {
-        console.log('🌐 Navigating to booking page...');
         await page.goto('https://booking.nrm.se/booking/1/1/offers/232', { waitUntil: 'networkidle0' });
-
-        console.log('📅 Clicking date filter button...');
         await page.click('#dateFilterButton');
 
         // Extract raw dates from dropdown
@@ -52,29 +37,29 @@ dotenv.config();
             return `${year}-${swedishMonths[month.toLowerCase()]}-${day.padStart(2, '0')}`;  // Format to YYYY-MM-DD
         });
 
-        // Log raw and formatted dates
-        console.log('📅 Found dates in the dropdown:');
+        // Raw and formatted dates
+        // console.log('📅 Found dates in the dropdown:');
         rawDates.forEach((rawDate, i) => console.log(`${rawDate} --> ${formattedDates[i]}`));
+        // console.log('Formatted Dates Array:', formattedDates);
 
-        // Check dates after the cutoff date
+        // Result
         const res = FindDatesAfter('2025-02-26', formattedDates);
 
-        // Send results to Telegram
+        // Send to Telegram
         if (res.datesAfterCutoff.length > 0) {
-            const message = `Interstellar @ Cosmonova – There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}\n https://booking.nrm.se/booking/1/1/offers/232`;
-            sendMessage(message);
-            console.log('✅ Found new dates!');
+            sendMessage(`Interstellar @ Cosmonova – There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}\n https://booking.nrm.se/booking/1/1/offers/232`);
+            console.log("Found new dates!")
         } else {
             sendMessage(`Interstellar @ Cosmonova – No dates found after ${res.cutoffDate}.`);
-            console.log('❌ No new dates found.');
+            console.log("Sorry!")
         }
 
     } catch (error) {
-        console.error('🚨 Error occurred:', error);
+        console.error('Error:', error);
     } finally {
         if (browser) {
             await browser.close();
-            console.log('🛑 Browser closed.');
+            console.log('Browser closed.');
         }
         process.exit(0);  // Exit the process
     }
