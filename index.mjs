@@ -4,21 +4,16 @@ import { FindDatesAfter, swedishMonths } from './functions.mjs';
 import { sendMessage, listen } from './botzilla.mjs';
 import fs from 'fs';
 
-
-
+// Log Puppeteer's cache and executable path for debugging
 console.log('Puppeteer default cache directory:', puppeteer.defaultArgs().join('\n'));
 console.log('Expected Chrome executable path:', puppeteer.executablePath());
 
 dotenv.config();
 
-
-console.log('Puppeteer default cache directory:', puppeteer.defaultArgs().join('\n'));
-console.log('Expected Chrome executable path:', puppeteer.executablePath());
-
 (async () => {
-    listen();
+    listen();  // Start listening for incoming Telegram messages
 
-    const chromePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/linux-132.0.6834.110/chrome-linux64/chrome';
+    const chromePath = process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath();
 
     // Log the path being used
     console.log('🚀 Launching Puppeteer with executable path:', chromePath);
@@ -29,9 +24,10 @@ console.log('Expected Chrome executable path:', puppeteer.executablePath());
         process.exit(1);  // Stop execution if the binary is missing
     }
 
+    // Launch Puppeteer with the specified Chrome executable
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: chromePath,
+        executablePath: chromePath,  // Use environment or default path
     });
 
     const page = await browser.newPage();
@@ -63,7 +59,7 @@ console.log('Expected Chrome executable path:', puppeteer.executablePath());
         // Check dates after the cutoff date
         const res = FindDatesAfter('2025-02-26', formattedDates);
 
-        // Send to Telegram
+        // Send results to Telegram
         if (res.datesAfterCutoff.length > 0) {
             const message = `Interstellar @ Cosmonova – There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}\n https://booking.nrm.se/booking/1/1/offers/232`;
             sendMessage(message);
