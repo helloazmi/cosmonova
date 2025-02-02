@@ -2,7 +2,7 @@ name: Run Cosmonova Bot
 
 on:
   schedule:
-        - cron: '0 8,10,12,14,16,18,20,22,0 * * *'  # Runs at 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00, and 00:00
+        - cron: '0 8,10,12,14,16,18,20,22,0 * * *'  # Runs at 08:00, 10:00, 12:00, etc.
   workflow_dispatch:       # Allows manual trigger
 
 jobs:
@@ -16,13 +16,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18'   # Puppeteer requires Node.js 18 or higher
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
-
-      - name: Install Puppeteer Chrome browser
-        run: npx puppeteer browsers install chrome  # Ensure compatible Chrome is installed
 
       - name: Run the bot script
         run: node index.mjs

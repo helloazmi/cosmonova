@@ -6,7 +6,6 @@ import { sendMessage, listen } from './botzilla.mjs';
     listen();
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: '/opt/render/.cache/puppeteer/chrome/linux-132.0.6834.110/chrome-linux64/chrome',  // Render default Chrome path
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',

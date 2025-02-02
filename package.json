@@ -1,11 +1,10 @@
 {
   "name": "cosmonova",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prestart": "chmod +x $(npx puppeteer executable-path --silent)",
-    "start": "node index.mjs"
+    "start": "node index.mjs",
+    "postinstall": "puppeteer install"
   },
   "keywords": [],
   "author": "",
