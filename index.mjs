@@ -11,11 +11,13 @@ dotenv.config();
         puppeteer.launch({
             headless: true,
             // Render.com
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/linux-132.0.6834.110/chrome-linux64/chrome'
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+
+            //executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/linux-132.0.6834.110/chrome-linux64/chrome'
             //Github
             //executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome'  // GitHub Actions: Default Chrome path
         });
-
+    console.log(process.env.PUPPETEER_EXECUTABLE_PAT)
     const page = await browser.newPage();
     await page.setViewport({ width: 390, height: 844 });  // iPhone 12 size
 
