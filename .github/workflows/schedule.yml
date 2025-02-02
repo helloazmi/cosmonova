@@ -25,4 +25,4 @@ jobs:
         run: npx puppeteer browsers install chrome  # Ensure compatible Chrome is installed
 
       - name: Run the bot script
-        run: node index.js
+        run: node index.mjs
