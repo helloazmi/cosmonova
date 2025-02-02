@@ -31,7 +31,7 @@ dotenv.config();
         });
 
         // Raw and formatted dates
-        console.log('📅 Found dates in the dropdown:');
+        // console.log('📅 Found dates in the dropdown:');
         rawDates.forEach((rawDate, i) => console.log(`${rawDate} --> ${formattedDates[i]}`));
         console.log('Formatted Dates Array:', formattedDates);
 
@@ -41,8 +41,10 @@ dotenv.config();
         // Send to Telegram
         if (res.datesAfterCutoff.length > 0) {
             sendMessage(`Interstellar @ Cosmonova – There are ${res.datesAfterCutoff.length} dates after ${res.cutoffDate}:\n${res.datesAfterCutoff.join('\n')}`);
+            console.log("Found new dates!")
         } else {
             sendMessage(`Interstellar @ Cosmonova – No dates found after ${res.cutoffDate}.`);
+            console.log("Sorry!")
         }
 
     } catch (error) {
