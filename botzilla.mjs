@@ -8,6 +8,10 @@ const chatId = process.env.TELEGRAM_CHAT_ID;
 
 const bot = new TelegramBot(botToken, { polling: true });
 
+console.log("botToken", botToken)
+console.log("bot", bot);
+
+
 // SENDING
 export function sendMessage(msg) {
     bot.sendMessage(chatId, msg);
