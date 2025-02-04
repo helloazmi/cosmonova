@@ -5,7 +5,7 @@ on:
     branches:
       - github  # Trigger on the 'github' branch
   schedule:
-    - cron: '0 8,10,12,14,16,18,20,22,0 * * *'  # Runs at specific times
+  - cron: '0 12 * * *'  # Runs at 12:00 PM every day
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
